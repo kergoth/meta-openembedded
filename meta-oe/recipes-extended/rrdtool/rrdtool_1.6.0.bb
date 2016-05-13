@@ -82,20 +82,40 @@ do_configure() {
         -e "s:perl-shared/Makefile.PL Makefile:perl-shared/Makefile.PL:" \
         ${B}/bindings/Makefile
 
-    #redo the perl bindings
-    (
-    cd ${S}/bindings/perl-shared;
-    perl Makefile.PL INSTALLDIRS="vendor" INSTALLPRIVLIB="abc";
-
-    cd ../../bindings/perl-piped;
-    perl Makefile.PL INSTALLDIRS="vendor";
-    )
-
     #change the interpreter in file
     sed -i -e "s|^PERL = ${STAGING_BINDIR_NATIVE}/.*|PERL = /usr/bin/perl|g" \
         ${B}/examples/Makefile
     sed -i -e "s|${STAGING_BINDIR_NATIVE}/perl-native/perl|/usr/bin/perl|g" \
         ${B}/examples/*.pl
+
+    sed -i -e '/SUBDIRS/s/bindings//' "${B}/Makefile"
+}
+
+do_compile () {
+    oe_runmake
+
+    cd ${B}/bindings
+    oe_runmake python
+
+    # MAKE is set to true to ensure that the Makefile is generated from
+    # Makefile.PL, but not actually built, so we can apply the cpan.bbclass
+    # Makefile fixups first
+    oe_runmake MAKE=true perl-shared perl-piped
+    if [ "${BUILD_SYS}" != "${HOST_SYS}" ]; then
+        find ${S}/bindings -name Makefile.PL | while read f; do
+            f="${B}/bindings/${f#${S}/bindings/}"
+            f="${f%.PL}"
+            if [ ! -e "$f" ]; then
+                bbfatal "$f does not exist"
+            fi
+            sed -i -e "s:\(PERL_ARCHLIB = \).*:\1${PERL_ARCHLIB}:" \
+                   -e 's/perl.real/perl/' \
+                   -e "s|^\(CCFLAGS =.*\)|\1 ${CFLAGS}|" \
+                $f
+        done
+    fi
+    oe_runmake -C ${B}/bindings/perl-shared
+    oe_runmake -C ${B}/bindings/perl-piped
 }
 
 PACKAGES =+ "${PN}-perl ${PN}-python"
