@@ -13,4 +13,10 @@ SRC_URI[sha256sum] = "da9827876f10a8b447270368753392cfd502e70a2e9d1361554e5dfcb1
 
 inherit cmake
 
+EXTRA_OECMAKE += "\
+    '-DASSIMP_LIB_INSTALL_DIR=${libdir}' \
+    '-DASSIMP_INCLUDE_INSTALL_DIR=${includedir}' \
+    '-DASSIMP_BIN_INSTALL_DIR=${bindir}' \
+"
+
 FILES_${PN}-dev += "${libdir}/cmake"
