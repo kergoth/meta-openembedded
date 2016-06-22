@@ -47,9 +47,9 @@ PACKAGES =+ "${PN}-contrib ${PN}-exec ${PN}-plugins ${PN}-python"
 
 RDEPENDS_${PN} = "bash"
 RDEPENDS_${PN}-exec = "${PN}"
-RDEPENDS_${PN}-python = "python"
+RDEPENDS_${PN}-python = "python3"
 
-RRECOMMENDS_lirc = "${PN}-exec ${PN}-plugins"
+RRECOMMENDS_${PN} = "${PN}-exec ${PN}-plugins ${PN}-python"
 
 FILES_${PN}-plugins = "${libdir}/lirc/plugins/*.so ${datadir}/lirc/configs"
 FILES_${PN}-contrib = "${datadir}/lirc/contrib"
