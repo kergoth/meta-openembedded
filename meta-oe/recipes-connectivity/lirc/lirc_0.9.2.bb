@@ -43,11 +43,13 @@ do_install_append() {
     rmdir ${D}/var/run/lirc ${D}/var/run
 }
 
-PACKAGES =+ "${PN}-contrib ${PN}-exec ${PN}-plugins ${PN}-python"
+PACKAGES =+ "${PN}-contrib ${PN}-exec ${PN}-plugins"
+PACKAGE_BEFORE_PN += "${PN}-python"
 
 RDEPENDS_${PN} = "bash"
 RDEPENDS_${PN}-exec = "${PN}"
 RDEPENDS_${PN}-python = "python3"
+RREPLACES_${PN}-python = "${PN}"
 
 RRECOMMENDS_${PN} = "${PN}-exec ${PN}-plugins ${PN}-python"
 
@@ -59,7 +61,7 @@ FILES_${PN} += "${systemd_unitdir}/system/lircd.service"
 FILES_${PN} += "${systemd_unitdir}/system/lircd.socket"
 FILES_${PN} += "${libdir}/tmpfiles.d/lirc.conf"
 FILES_${PN}-dbg += "${libdir}/lirc/plugins/.debug"
-FILES_${PN}-python += "${libdir}/python*/site-packages"
+FILES_${PN}-python += "${bindir}/lirc-setup ${bindir}/irdb-get ${bindir}/pronto2lirc ${libdir}/python*/site-packages"
 
 
 INITSCRIPT_PACKAGES = "lirc lirc-exec"
